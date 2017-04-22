@@ -1,7 +1,7 @@
-package cs.uwf.edu.ktane.game;
+package edu.uwf.cs.ktane.game;
 
 import com.google.common.collect.Sets;
-import cs.uwf.edu.speech.Listener;
+import edu.uwf.cs.speech.Listener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

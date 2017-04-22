@@ -1,4 +1,4 @@
-package cs.uwf.edu.ktane.game;
+package edu.uwf.cs.ktane.game;
 
 import lombok.Builder;
 import lombok.Getter;

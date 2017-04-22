@@ -1,7 +1,7 @@
-package cs.uwf.edu.ktane.bomb;
+package edu.uwf.cs.ktane.bomb;
 
 import com.google.common.collect.Sets;
-import cs.uwf.edu.ktane.game.ListeningConfig;
+import edu.uwf.cs.ktane.game.ListeningConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -59,23 +59,23 @@ public class Button extends ModuleBase {
         if (getColor().equalsIgnoreCase("blue") && getText().equalsIgnoreCase("abort")) {
             displayClickAndHold();
         } else if (getBatNum() > 1 && getText().equalsIgnoreCase("detonate")) {
-            System.out.println("Click and immediately release the button");
+            bomb.postToUser("Click and immediately release the button");
         } else if (getColor().equalsIgnoreCase("white") && isHasCar()) {
             displayClickAndHold();
         } else if (getBatNum() > 2 && isHasFrk()) {
-            System.out.println("Click and immediately release the button");
+            bomb.postToUser("Click and immediately release the button");
         } else if (getColor().equalsIgnoreCase("yellow")) {
             displayClickAndHold();
         } else if (getColor().equalsIgnoreCase("red") && getText().equalsIgnoreCase("hold")) {
-            System.out.println("Click and immediately release the button");
+            bomb.postToUser("Click and immediately release the button");
         } else {
             displayClickAndHold();
         }
     }
 
     public void displayClickAndHold() {
-        System.out.println("Click and hold.\n\n If blue, release if there is a \"4\" anywhere on the counter.");
-        System.out.println("If yellow, release if there is a \"5\" anywhere on the counter.");
-        System.out.println("If any other color, release if there is a \"1\" anywhere on the counter.");
+        bomb.postToUser("Click and hold.\n\n If blue, release if there is a \"4\" anywhere on the counter.");
+        bomb.postToUser("If yellow, release if there is a \"5\" anywhere on the counter.");
+        bomb.postToUser("If any other color, release if there is a \"1\" anywhere on the counter.");
     }
 }

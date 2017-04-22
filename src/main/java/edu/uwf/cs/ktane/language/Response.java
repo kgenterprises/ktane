@@ -1,4 +1,4 @@
-package cs.uwf.edu.ktane.language;
+package edu.uwf.cs.ktane.language;
 
 import lombok.Getter;
 

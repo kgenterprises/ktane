@@ -1,7 +1,7 @@
-package cs.uwf.edu.ktane.bomb;
+package edu.uwf.cs.ktane.bomb;
 
 import com.google.common.collect.Sets;
-import cs.uwf.edu.ktane.game.ListeningConfig;
+import edu.uwf.cs.ktane.game.ListeningConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,18 +26,6 @@ public class Wires extends ModuleBase {
         setWireCount(0);
         wireColors = new ArrayList<>();
         setEndsWithOdd(false);
-    }
-
-    public boolean goodColorToAdd(String testcolor) {
-        if (testcolor.equalsIgnoreCase("white") || testcolor.equalsIgnoreCase("red")
-                || testcolor.equalsIgnoreCase("blue") || testcolor.equalsIgnoreCase("yellow")
-                || testcolor.equalsIgnoreCase("black")) {
-
-            return true;
-        } else {
-            System.out.println("Invalid color, please try again");
-            return false;
-        }
     }
 
     @Override
@@ -108,30 +96,30 @@ public class Wires extends ModuleBase {
         //If there are three wires.
         if (getWireCount() == 3) {
             if (redCount == 0) {
-                System.out.println("Cut the second wire.");
+                bomb.postToUser("Cut the second wire.");
             } else if (wireColors.get(2)
                                  .equalsIgnoreCase("white")) {
-                System.out.println("Cut the last wire");
+                bomb.postToUser("Cut the last wire");
             } else if (blueCount > 1) {
-                System.out.println("Cut the last blue wire");
+                bomb.postToUser("Cut the last blue wire");
             } else {
-                System.out.println("Cut the last wire");
+                bomb.postToUser("Cut the last wire");
             }
         }
 
         //If there are four wires total
         else if (getWireCount() == 4) {
             if (redCount > 1 && isEndsWithOdd()) {
-                System.out.println("Cut the last red wire");
+                bomb.postToUser("Cut the last red wire");
             } else if (getWireColors().get(3)
                                       .equalsIgnoreCase("yellow") && redCount == 0) {
-                System.out.println("Cut the first wire");
+                bomb.postToUser("Cut the first wire");
             } else if (blueCount == 1) {
-                System.out.println("Cut the first wire");
+                bomb.postToUser("Cut the first wire");
             } else if (yellowCount > 1) {
-                System.out.println("Cut the last wire");
+                bomb.postToUser("Cut the last wire");
             } else {
-                System.out.println("Cut the second wire");
+                bomb.postToUser("Cut the second wire");
             }
         }
 
@@ -139,26 +127,26 @@ public class Wires extends ModuleBase {
         else if (getWireCount() == 5) {
             if (getWireColors().get(4)
                                .equalsIgnoreCase("black") && isEndsWithOdd()) {
-                System.out.println("Cut the fourth wire");
+                bomb.postToUser("Cut the fourth wire");
             } else if (redCount == 1 && yellowCount > 1) {
-                System.out.println("Cut the first wire");
+                bomb.postToUser("Cut the first wire");
             } else if (blackCount == 0) {
-                System.out.println("Cut the second wire");
+                bomb.postToUser("Cut the second wire");
             } else {
-                System.out.println("Cut the first wire");
+                bomb.postToUser("Cut the first wire");
             }
         }
 
         //If there are six wires total
         else {
             if (yellowCount == 0 && isEndsWithOdd()) {
-                System.out.println("Cut the third wire");
+                bomb.postToUser("Cut the third wire");
             } else if (yellowCount == 1 && whiteCount > 1) {
-                System.out.println("Cut the fourth wire");
+                bomb.postToUser("Cut the fourth wire");
             } else if (redCount == 0) {
-                System.out.println("Cut the last wire");
+                bomb.postToUser("Cut the last wire");
             } else {
-                System.out.println("Cut the fourth wire");
+                bomb.postToUser("Cut the fourth wire");
             }
         }
 

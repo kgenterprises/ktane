@@ -1,14 +1,15 @@
-package cs.uwf.edu.ktane.bomb;
+package edu.uwf.cs.ktane.bomb;
 
 import com.google.common.collect.Sets;
-import cs.uwf.edu.ktane.game.KtaneGame;
-import cs.uwf.edu.ktane.game.ListeningConfig;
+import edu.uwf.cs.ktane.game.KtaneGame;
+import edu.uwf.cs.ktane.game.ListeningConfig;
+import edu.uwf.cs.ktane.language.Response;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import static cs.uwf.edu.ktane.language.Response.YES;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 @Getter
 @Setter
@@ -29,6 +30,8 @@ public class Bomb {
 
     public static final String VERSION_NUMBER = "Version One; Revision Three";
 
+    private static final Logger LOG = LogManager.getLogger(Bomb.class);
+
     public void getBombInfo() {
 
         //getFromUser the batteries
@@ -46,7 +49,7 @@ public class Bomb {
                                                            .yesNo(true)
                                                            .build();
         String ppResponse = game.getFromUser(ppListeningConfig);
-        if (ppResponse.equalsIgnoreCase(YES.getResponse())) {
+        if (ppResponse.equalsIgnoreCase(Response.YES.getResponse())) {
             setHasParallelPort(true);
         }
 
@@ -56,7 +59,7 @@ public class Bomb {
                                                               .yesNo(true)
                                                               .build();
         String vowelResponse = game.getFromUser(vowelListeningConfig);
-        if (vowelResponse.equalsIgnoreCase(YES.getResponse())) {
+        if (vowelResponse.equalsIgnoreCase(Response.YES.getResponse())) {
             setHasVowel(true);
         }
 
@@ -66,7 +69,7 @@ public class Bomb {
                                                                      .yesNo(true)
                                                                      .build();
         String serialNumberResponse = game.getFromUser(serialNumberListeningConfig);
-        if (serialNumberResponse.equalsIgnoreCase(YES.getResponse())) {
+        if (serialNumberResponse.equalsIgnoreCase(Response.YES.getResponse())) {
             setEndsWithOdd(true);
         }
 
@@ -76,7 +79,7 @@ public class Bomb {
                                                                .yesNo(true)
                                                                .build();
         String litFrkResponse = game.getFromUser(litFrkListeningConfig);
-        if (litFrkResponse.equalsIgnoreCase(YES.getResponse())) {
+        if (litFrkResponse.equalsIgnoreCase(Response.YES.getResponse())) {
             setHasFrk(true);
         }
 
@@ -86,12 +89,12 @@ public class Bomb {
                                                                         .yesNo(true)
                                                                         .build();
         String litCarIndicatorResponse = game.getFromUser(litCarIndicatorListeningConfig);
-        if (litCarIndicatorResponse.equalsIgnoreCase(YES.getResponse())) {
+        if (litCarIndicatorResponse.equalsIgnoreCase(Response.YES.getResponse())) {
             setHasCar(true);
         }
 
         //TODO: delete or change to debug configuration with real logger
-        System.out.println(toString());
+        LOG.warn(toString());
     }
 
     public void getModNameFromUser() {

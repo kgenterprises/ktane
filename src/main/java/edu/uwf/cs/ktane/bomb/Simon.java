@@ -1,13 +1,13 @@
-package cs.uwf.edu.ktane.bomb;
+package edu.uwf.cs.ktane.bomb;
 
 /**
  * Created by bryansolomon on 4/22/17.
  */
-public class Memory extends ModuleBase {
+public class Simon extends ModuleBase {
 
-    public static final String MOD_NAME = "memory";
+    public static final String MOD_NAME = "simon";
 
-    public Memory(Bomb bomb) {
+    public Simon(Bomb bomb) {
         this.bomb = bomb;
     }
 

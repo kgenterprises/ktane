@@ -1,4 +1,4 @@
-package cs.uwf.edu.ktane.bomb;
+package edu.uwf.cs.ktane.bomb;
 
 import lombok.Getter;
 import lombok.Setter;

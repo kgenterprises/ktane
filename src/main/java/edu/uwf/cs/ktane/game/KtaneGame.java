@@ -1,11 +1,12 @@
-package cs.uwf.edu.ktane.game;
+package edu.uwf.cs.ktane.game;
 
-import cs.uwf.edu.ktane.bomb.Bomb;
-import cs.uwf.edu.speech.Listener;
+import edu.uwf.cs.ktane.bomb.Bomb;
+import edu.uwf.cs.ktane.language.Response;
+import edu.uwf.cs.speech.Listener;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import static cs.uwf.edu.ktane.language.Response.*;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 @RequiredArgsConstructor
 public class KtaneGame implements Runnable {
@@ -17,6 +18,8 @@ public class KtaneGame implements Runnable {
     private String currentResponse;
 
     private final Listener listener;
+
+    private static final Logger LOG = LogManager.getLogger(KtaneGame.class);
 
     @Setter
     private ListeningConfig listeningConfig;
@@ -102,9 +105,9 @@ public class KtaneGame implements Runnable {
     String processYesNoResponse(String response) {
         switch (response) {
             case "yes":
-                return YES.getResponse();
+                return Response.YES.getResponse();
             case "no":
-                return NO.getResponse();
+                return Response.NO.getResponse();
             default:
                 return null;
         }
@@ -127,7 +130,7 @@ public class KtaneGame implements Runnable {
             bomb.getModNameFromUser();
 
             if (bomb.getCurrentModuleName()
-                    .equals(DONE.getResponse())) {
+                    .equals(Response.DONE.getResponse())) {
                 bomb.setSolved(true);
             } else {
                 //getFromUser info required to set the module
@@ -158,7 +161,7 @@ public class KtaneGame implements Runnable {
     }
 
     public void postToUser(String toPost) {
-        System.out.println(toPost);
+        LOG.debug(toPost);
     }
 
     @Override

@@ -1,6 +1,5 @@
-package cs.uwf.edu.speech;
+package edu.uwf.cs.speech;
 
-import io.grpc.ManagedChannel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,10 +43,6 @@ public class ListenerTest {
 
   @Test
   public void test16KHzAudio() throws InterruptedException, IOException {
-    String host = "speech.googleapis.com";
-    int port = 443;
-    ManagedChannel channel = Listener.createChannel(host, port);
-
     final FileInputStream in = new FileInputStream("resources/audio.raw");
 
     final int samplingRate = 16000;
@@ -85,10 +80,6 @@ public class ListenerTest {
 
   @Test
   public void test32KHzAudio() throws InterruptedException, IOException {
-    String host = "speech.googleapis.com";
-    int port = 443;
-    ManagedChannel channel = Listener.createChannel(host, port);
-
     final FileInputStream in = new FileInputStream("resources/audio32KHz.raw");
 
     final int samplingRate = 32000;

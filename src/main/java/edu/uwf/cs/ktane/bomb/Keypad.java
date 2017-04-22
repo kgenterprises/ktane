@@ -1,6 +1,6 @@
-package cs.uwf.edu.ktane.bomb;
+package edu.uwf.cs.ktane.bomb;
 
-import cs.uwf.edu.ktane.game.ListeningConfig;
+import edu.uwf.cs.ktane.game.ListeningConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -76,9 +76,9 @@ public class Keypad extends ModuleBase {
                 && allSymbols.contains(sym3) && allSymbols.contains(sym4)) {
 
             //find the column then output the order
-            System.out.println(getOrderOfSymbols(findColumn(), sym1, sym2, sym3, sym4));
+            bomb.postToUser(getOrderOfSymbols(findColumn(), sym1, sym2, sym3, sym4));
         } else {
-            System.out.println("You did not enter valid symbols." +
+            bomb.postToUser("You did not enter valid symbols." +
                     "\nBe sure to follow the instruction in the readme file\n");
         }
     }

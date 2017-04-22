@@ -1,4 +1,4 @@
-package cs.uwf.edu.ktane.bomb;
+package edu.uwf.cs.ktane.bomb;
 
 /**
  * Created by bryansolomon on 4/22/17.

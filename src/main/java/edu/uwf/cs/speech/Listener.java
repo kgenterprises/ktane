@@ -1,40 +1,26 @@
-package cs.uwf.edu.speech;
+package edu.uwf.cs.speech;
 
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.speech.v1beta1.RecognitionConfig;
+import com.google.cloud.speech.v1beta1.*;
 import com.google.cloud.speech.v1beta1.RecognitionConfig.AudioEncoding;
-import com.google.cloud.speech.v1beta1.SpeechContext;
-import com.google.cloud.speech.v1beta1.SpeechGrpc;
-import com.google.cloud.speech.v1beta1.StreamingRecognitionConfig;
-import com.google.cloud.speech.v1beta1.StreamingRecognitionResult;
-import com.google.cloud.speech.v1beta1.StreamingRecognizeRequest;
-import com.google.cloud.speech.v1beta1.StreamingRecognizeResponse;
 import com.google.protobuf.ByteString;
-import cs.uwf.edu.ktane.game.KtaneGame;
+import edu.uwf.cs.ktane.game.KtaneGame;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.auth.ClientAuthInterceptor;
 import io.grpc.stub.StreamObserver;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.TargetDataLine;
-import java.io.File;
-import java.io.FileInputStream;
+import javax.sound.sampled.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.log4j.ConsoleAppender.SYSTEM_OUT;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -42,13 +28,12 @@ import static org.apache.log4j.ConsoleAppender.SYSTEM_OUT;
  */
 public class Listener implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(Listener.class.getName());
-    // TODO bring file into project
-    private static final String CREDENTIALS_FILE = "/Users/bryansolomon/Downloads/speech/ktane/src/main/resources/GoogleSpeechCredentials.json";
+    private static final Logger LOG = LogManager.getLogger(Listener.class);
+    private static final String CREDENTIALS_FILE = "GoogleSpeechCredentials.json";
 
-    private final String host = "speech.googleapis.com";
-    private final Integer port = 443;
-    private final Integer samplingRate = 16000;
+    private static final String HOST = "speech.googleapis.com";
+    private static final Integer PORT = 443;
+    private static final Integer SAMPLING_RATE = 16000;
 
     private final ManagedChannel channel;
     private final SpeechGrpc.SpeechStub speechClient;
@@ -63,33 +48,35 @@ public class Listener implements Runnable {
     // Used for testing
     protected TargetDataLine mockDataLine = null;
 
+    private AtomicBoolean running;
+
     /**
-     * Construct client connecting to Cloud Speech server at {@code host:port}.
+     * Construct client connecting to Cloud Speech server at {@code HOST:PORT}.
      */
     public Listener() throws IOException {
 
-        this.channel = createChannel(host, port);
-        this.bytesPerBuffer = samplingRate * BYTES_PER_SAMPLE / 10; // 100 ms
+        this.channel = createChannel(HOST, PORT);
+        this.bytesPerBuffer = SAMPLING_RATE * BYTES_PER_SAMPLE / 10; // 100 ms
 
         speechClient = SpeechGrpc.newStub(channel);
-
-        // Send log4j logs to Console
-        ConsoleAppender appender = new ConsoleAppender(new SimpleLayout(), SYSTEM_OUT);
-        logger.addAppender(appender);
     }
 
     public void shutdown() throws InterruptedException {
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        channel.shutdown()
+               .awaitTermination(5, TimeUnit.SECONDS);
     }
 
-    static ManagedChannel createChannel(String host, int port) throws IOException {
-        File initialFile = new File(CREDENTIALS_FILE);
-
-        GoogleCredentials creds = GoogleCredentials.fromStream(new FileInputStream(initialFile));
+    ManagedChannel createChannel(String host, int port) throws IOException {
+        getClass().getClassLoader()
+            .getResourceAsStream(CREDENTIALS_FILE);
+        GoogleCredentials creds = GoogleCredentials.fromStream(getClass().getClassLoader()
+                                                                         .getResourceAsStream(CREDENTIALS_FILE));
 
         creds = creds.createScoped(OAUTH2_SCOPES);
-        ManagedChannel channel =
-                ManagedChannelBuilder.forAddress(host, port).intercept(new ClientAuthInterceptor(creds, Executors.newSingleThreadExecutor())).build();
+        ManagedChannel channel = ManagedChannelBuilder
+                .forAddress(host, port)
+                .intercept(new ClientAuthInterceptor(creds, Executors.newSingleThreadExecutor()))
+                .build();
 
         return channel;
     }
@@ -103,10 +90,10 @@ public class Listener implements Runnable {
             return mockDataLine;
         }
 
-        AudioFormat format = new AudioFormat(samplingRate, BYTES_PER_SAMPLE * 8, 1, true, false);
+        AudioFormat format = new AudioFormat(SAMPLING_RATE, BYTES_PER_SAMPLE * 8, 1, true, false);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
         if (!AudioSystem.isLineSupported(info)) {
-            throw new RuntimeException(String.format("Device doesn't support LINEAR16 mono raw audio format at {%d}Hz", samplingRate));
+            throw new RuntimeException(String.format("Device doesn't support LINEAR16 mono raw audio format at {%d}Hz", SAMPLING_RATE));
         }
         try {
             TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info);
@@ -142,38 +129,31 @@ public class Listener implements Runnable {
                 }
 
                 StreamingRecognitionResult result = results.get(0);
-                String transcript = result.getAlternatives(0).getTranscript();
-
-                // Print interim results with a line feed, so subsequent transcriptions will overwrite
-                // it. Final result will print a newline.
-                String format = "%-" + this.sentenceLength + 's';
+                String transcript = result.getAlternatives(0)
+                                          .getTranscript();
                 if (result.getIsFinal()) {
-                    format += '\n';
-                    this.sentenceLength = 1;
 
-                    if (transcript.toLowerCase().indexOf("exit") >= 0) {
-                        finishLatch.countDown();
-                    }
-                } else {
-                    format += '\r';
-                    this.sentenceLength = transcript.length();
+                    LOG.info("Raw response: " + transcript);
+
+                    game.processResponse(transcript);
                 }
-                String formattedTranscript = String.format(format, transcript);
-                System.out.print("Raw response: " + formattedTranscript);
-
-                game.processResponse(formattedTranscript);
             }
 
             @Override
             public void onError(Throwable error) {
-                logger.log(Level.ERROR, "getRecognition failed: {0}", error);
+                // ignore 60 second timeout according to: https://cloud.google.com/speech/limits
+                if (!(error instanceof StatusRuntimeException) && !error.getMessage().contains("Client GRPC deadline too short")) {
+                    LOG.info("GetRecognition failed: {0}", error);
+                    running.getAndSet(false);
+                }
                 finishLatch.countDown();
             }
 
             @Override
             public void onCompleted() {
-                logger.info("getRecognition completed.");
+                LOG.info("GetRecognition completed.");
                 finishLatch.countDown();
+                running.getAndSet(false);
             }
         };
 
@@ -187,11 +167,10 @@ public class Listener implements Runnable {
             RecognitionConfig config = RecognitionConfig
                     .newBuilder()
                     .setEncoding(AudioEncoding.LINEAR16)
-                    .setSampleRate(samplingRate)
+                    .setSampleRate(SAMPLING_RATE)
                     .setSpeechContext(SpeechContext
                             .newBuilder()
-                            .addPhrases(
-                                    "bomb description battery FRK parallel port wires button key one two three four five six")  // TODO space delimited? multiple phrases
+                            .addPhrases("bomb description battery FRK parallel PORT wires button key one two three four five six")  // TODO space delimited? multiple phrases
                     )
                     .build();
 
@@ -237,24 +216,20 @@ public class Listener implements Runnable {
         requestObserver.onCompleted();
 
         // Receiving happens asynchronously.
-        finishLatch.await(5, TimeUnit.MINUTES);
-
+        finishLatch.await(2, TimeUnit.MINUTES);
     }
 
     @Override
     public void run() {
-        System.out.println("Starting listener client");
-        Listener client = null;
+        LOG.info("Starting listener client");
+        running = new AtomicBoolean(true);
         try {
-            getRecognition();
-        } catch (Exception e) {
-            System.out.println("An unexpected error occurred: " + e.toString());
-        } finally {
-            try {
-                client.shutdown();
-            } catch (InterruptedException ie) {
-                System.out.println("Failed to shutdown client: " + ie.toString());
+            while(running.get()) {
+                getRecognition();
+                LOG.info("Resetting connection with GCP");
             }
+        } catch (Exception e) {
+            LOG.info("An unexpected error occurred: " + e.toString());
         }
     }
 

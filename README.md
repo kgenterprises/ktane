@@ -2,17 +2,16 @@
 
 ## Prerequisites
 
-### Point to the credentials file
-
-The credentials file are in this repo under src>resources. The project is not yet configured to find this file dynamically
-so to run the project you must point to the file in the Listener.java class. An absolute path is required.
-The string for the filepath is a constant called CREDENTIALS_FILE
-
 ### Download and install Java and Maven
 
-Install [Java7 or
-higher](http://www.oracle.com/technetwork/java/javase/downloads/jre7-downloads-1880261.html).
+Install Java 8. Ensure your JAVA_HOME variable is set to a 1.8 JDK
 
+```sh
+# check if set
+$ printenv JAVA_HOME
+# if not set
+$ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+```
 This project uses the [Apache Maven][maven] build system. Before getting started, be
 sure to [download][maven-download] and [install][maven-install] it. When you use
 Maven as described here, it will automatically download the needed client
@@ -29,5 +28,6 @@ will require you to download the corresponding Lombok plugin for Intellij or Ecl
 
 ## Running the project
 
-Set your maven preferences to download and install dependencies automatically. After that, you can run
-the main method in KtaneManager.java at any time to play.
+```sh
+$ mvn install -DskipTests
+```

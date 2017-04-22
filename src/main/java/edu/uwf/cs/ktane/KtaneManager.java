@@ -1,7 +1,7 @@
-package cs.uwf.edu.ktane;
+package edu.uwf.cs.ktane;
 
-import cs.uwf.edu.ktane.game.KtaneGame;
-import cs.uwf.edu.speech.Listener;
+import edu.uwf.cs.ktane.game.KtaneGame;
+import edu.uwf.cs.speech.Listener;
 
 /**
  * Manager for Speech Recognition and Ktane game threads
