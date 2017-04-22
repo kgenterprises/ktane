@@ -40,11 +40,11 @@ import static org.apache.log4j.ConsoleAppender.SYSTEM_OUT;
 /**
  * Client that sends streaming audio to Speech.Recognize and returns streaming transcript.
  */
-public class StreamingRecognizeClient implements Runnable {
+public class Listener implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(StreamingRecognizeClient.class.getName());
+    private static final Logger logger = Logger.getLogger(Listener.class.getName());
     // TODO bring file into project
-    private static final String FILENAME = "/Users/bryansolomon/Downloads/speech/grpc/src/main/resources/GoogleSpeechCredentials.json";
+    private static final String CREDENTIALS_FILE = "/Users/bryansolomon/Downloads/speech/ktane/src/main/resources/GoogleSpeechCredentials.json";
 
     private final String host = "speech.googleapis.com";
     private final Integer port = 443;
@@ -66,7 +66,7 @@ public class StreamingRecognizeClient implements Runnable {
     /**
      * Construct client connecting to Cloud Speech server at {@code host:port}.
      */
-    public StreamingRecognizeClient() throws IOException {
+    public Listener() throws IOException {
 
         this.channel = createChannel(host, port);
         this.bytesPerBuffer = samplingRate * BYTES_PER_SAMPLE / 10; // 100 ms
@@ -74,9 +74,6 @@ public class StreamingRecognizeClient implements Runnable {
         speechClient = SpeechGrpc.newStub(channel);
 
         // Send log4j logs to Console
-        // If you are going to run this on GCE, you might wish to integrate with
-        // google-cloud-java logging. See:
-        // https://github.com/GoogleCloudPlatform/google-cloud-java/blob/master/README.md#stackdriver-logging-alpha
         ConsoleAppender appender = new ConsoleAppender(new SimpleLayout(), SYSTEM_OUT);
         logger.addAppender(appender);
     }
@@ -86,8 +83,7 @@ public class StreamingRecognizeClient implements Runnable {
     }
 
     static ManagedChannel createChannel(String host, int port) throws IOException {
-        //GoogleCredentials creds = GoogleCredentials.getApplicationDefault();
-        File initialFile = new File(FILENAME);
+        File initialFile = new File(CREDENTIALS_FILE);
 
         GoogleCredentials creds = GoogleCredentials.fromStream(new FileInputStream(initialFile));
 
@@ -166,10 +162,6 @@ public class StreamingRecognizeClient implements Runnable {
                 System.out.print("Raw response: " + formattedTranscript);
 
                 game.processResponse(formattedTranscript);
-
-                // we can't return from this method due to superclass implementation
-                // save transcript results so they can be returned outside of this method
-//            recognitionResult += transcript;
             }
 
             @Override
@@ -245,14 +237,14 @@ public class StreamingRecognizeClient implements Runnable {
         requestObserver.onCompleted();
 
         // Receiving happens asynchronously.
-        finishLatch.await(1, TimeUnit.MINUTES);
+        finishLatch.await(5, TimeUnit.MINUTES);
 
     }
 
     @Override
     public void run() {
         System.out.println("Starting listener client");
-        StreamingRecognizeClient client = null;
+        Listener client = null;
         try {
             getRecognition();
         } catch (Exception e) {

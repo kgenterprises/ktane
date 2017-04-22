@@ -1,11 +1,13 @@
 package cs.uwf.edu.ktane.game;
 
-import cs.uwf.edu.speech.StreamingRecognizeClient;
 import cs.uwf.edu.ktane.bomb.Bomb;
+import cs.uwf.edu.speech.Listener;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-import static cs.uwf.edu.ktane.language.Responses.NO;
-import static cs.uwf.edu.ktane.language.Responses.YES;
+import static cs.uwf.edu.ktane.language.Response.*;
 
+@RequiredArgsConstructor
 public class KtaneGame implements Runnable {
 
     private Bomb bomb;
@@ -14,33 +16,55 @@ public class KtaneGame implements Runnable {
 
     private String currentResponse;
 
-    private StreamingRecognizeClient listener;
+    private final Listener listener;
 
+    @Setter
     private ListeningConfig listeningConfig;
 
     public void processResponse(String response) {
         if (listeningConfig != null && listeningConfig.isApplicable()) {
+
             response = response.replaceAll("\\n", "");
+            response = response.toLowerCase()
+                               .trim();
+
             String result = null;
+
             if (listeningConfig.isNumeric()) {
                 result = processNumericResponse(response);
             } else if (listeningConfig.isYesNo()) {
                 result = processYesNoResponse(response);
             }
 
+            if (listeningConfig.getPossibleAnswers() != null) {
+                result = processFiniteSetOfResponses(result == null ? response : result);
+            }
 
             if (result != null) {
+//                if (listeningConfig.isValidate()) {
+//                    if (listeningConfig.getAnswerToValidate() != null) {
+//                        if (!listeningConfig.getAnswerToValidate()
+//                                            .equals(result)) {
+//                            postToUser(String.format("Your response could not be validated: %s != %s", listeningConfig.getAnswerToValidate(), result));
+//                            getFromUser(listeningConfig);
+//                        }
+//                    } else {
+//                        // first loop
+//                        postToUser(listeningConfig.getValidationMessage());
+//                        return;
+//                    }
+//                }
                 currentResponse = result;
                 listening = false;
                 listeningConfig.setApplicable(false);
             } else {
-                post(listeningConfig.getInvalidNotification());
-                post(listeningConfig.getQuestion());
+                postToUser(listeningConfig.getInvalidNotification());
+                postToUser(listeningConfig.getQuestion());
             }
         }
     }
 
-    private String processNumericResponse(String response) {
+    String processNumericResponse(String response) {
         /* first try the string as is */
         try {
             Integer.parseInt(response);
@@ -49,7 +73,7 @@ public class KtaneGame implements Runnable {
             // do nothing
         }
         /* okay it might be textual repres., try to map it */
-        switch (response.toLowerCase().trim()) {
+        switch (response) {
             case "one":
                 return "1";
             case "two":
@@ -75,8 +99,8 @@ public class KtaneGame implements Runnable {
         }
     }
 
-    private String processYesNoResponse(String response) {
-        switch(response.toLowerCase().trim()) {
+    String processYesNoResponse(String response) {
+        switch (response) {
             case "yes":
                 return YES.getResponse();
             case "no":
@@ -86,48 +110,42 @@ public class KtaneGame implements Runnable {
         }
     }
 
+    String processFiniteSetOfResponses(String response) {
+        if (listeningConfig.getPossibleAnswers()
+                           .contains(response)) {
+            return response;
+        } else {
+            return null;
+        }
+    }
+
     public void play() {
+        //getFromUser module name
+        postToUser("Ready to solve modules.");
 
-        //get module name
-        post("Ready to solve modules.");
-
-        while (!bomb.getIsSolved()) {
+        while (!bomb.isSolved()) {
             bomb.getModNameFromUser();
 
-            if (bomb.getCurrentModuleName().equalsIgnoreCase("done")) {
-                bomb.setIsSolved(true);
+            if (bomb.getCurrentModuleName()
+                    .equals(DONE.getResponse())) {
+                bomb.setSolved(true);
             } else {
-                //get info required to set the module
-                bomb.setTheModule(bomb.getModInfo());
+                //getFromUser info required to set the module
+                bomb.setModule(bomb.getModInfo());
 
                 //solve the module
-                bomb.getTheModule().solve();
+                bomb.getModule()
+                    .solve();
             }
         }
 
-
-        //user input module name
-        //String moduleName = sc.nextLine();
-        //Gets the module name and makes sure its valid
-        //solve the module
-
-
-        // bomb.getTheModule().solve();
-
-        //bot confirm that the module name was heard correctly
-
-        //Bot asks for first user input
-
-        //user provides input
-
-
         //Close the application
-        post("Goodbye");
+        postToUser("Goodbye");
     }
 
-    public String get(ListeningConfig listeningConfig) {
+    public String getFromUser(ListeningConfig listeningConfig) {
         this.listeningConfig = listeningConfig;
-        post(listeningConfig.getQuestion());
+        postToUser(listeningConfig.getQuestion());
         listening = true;
         while (listening) {
             try {
@@ -139,23 +157,19 @@ public class KtaneGame implements Runnable {
         return currentResponse;
     }
 
-    public void post(String toPost) {
+    public void postToUser(String toPost) {
         System.out.println(toPost);
-    }
-
-    public void setListener(StreamingRecognizeClient listener) {
-        this.listener = listener;
     }
 
     @Override
     public void run() {
 
-        System.out.println("***Bot Started***\n.");
         bomb = new Bomb(this);
+        postToUser(String.format("*** Ktane Game %s Started ***", Bomb.VERSION_NUMBER));
 
-        //get bomb information
+        //getFromUser bomb information
         bomb.getBombInfo();
 
-//        play();
+        play();
     }
 }

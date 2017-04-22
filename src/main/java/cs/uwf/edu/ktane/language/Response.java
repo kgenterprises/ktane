@@ -2,15 +2,16 @@ package cs.uwf.edu.ktane.language;
 
 import lombok.Getter;
 
-public enum Responses {
+public enum Response {
 
     YES("yes"),
-    NO("no");
+    NO("no"),
+    DONE("done");
 
     @Getter
     private String response;
 
-    Responses(String response) {
+    Response(String response) {
         this.response = response;
     }
 }

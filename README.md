@@ -1,4 +1,4 @@
-# Cloud Speech API gRPC samples for Java
+# Keep Talking and Nobody Explodes
 
 This is a sample repo for accessing the [Google Cloud Speech API](http://cloud.google.com/speech) with
 [gRPC](http://www.grpc.io/) client library. Note that these samples are for `advanced users` and is in

@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Builder
 @Getter
 @Setter
@@ -20,4 +22,7 @@ public class ListeningConfig {
     private boolean numeric;
 
     private boolean yesNo;
+
+    private Set<String> possibleAnswers;
+
 }
