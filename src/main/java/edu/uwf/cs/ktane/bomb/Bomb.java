@@ -94,7 +94,7 @@ public class Bomb {
         }
 
         //TODO: delete or change to debug configuration with real logger
-        LOG.warn(toString());
+        LOG.debug(toString());
     }
 
     public void getModNameFromUser() {
