@@ -1,23 +1,19 @@
 # Keep Talking and Nobody Explodes
 
-This is a sample repo for accessing the [Google Cloud Speech API](http://cloud.google.com/speech) with
-[gRPC](http://www.grpc.io/) client library. Note that these samples are for `advanced users` and is in
-BETA. Please see [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages).
-
 ## Prerequisites
 
-### Enable the Speech API
+### Point to the credentials file
 
-If you have not already done so, [enable the Google Cloud Speech API for your project](https://console.developers.google.com/apis/api/speech.googleapis.com/overview).
-You must be whitelisted to do this.
-
+The credentials file are in this repo under src>resources. The project is not yet configured to find this file dynamically
+so to run the project you must point to the file in the Listener.java class. An absolute path is required.
+The string for the filepath is a constant called CREDENTIALS_FILE
 
 ### Download and install Java and Maven
 
 Install [Java7 or
 higher](http://www.oracle.com/technetwork/java/javase/downloads/jre7-downloads-1880261.html).
 
-This sample uses the [Apache Maven][maven] build system. Before getting started, be
+This project uses the [Apache Maven][maven] build system. Before getting started, be
 sure to [download][maven-download] and [install][maven-install] it. When you use
 Maven as described here, it will automatically download the needed client
 libraries.
@@ -26,51 +22,12 @@ libraries.
 [maven-download]: https://maven.apache.org/download.cgi
 [maven-install]: https://maven.apache.org/install.html
 
+###Download Lombok
 
-### Set Up to Authenticate With Your Project's Credentials
+This project uses Lombok to generate boilerplate code. While running the project will work fine, automatic compilation in an IDE 
+will require you to download the corresponding Lombok plugin for Intellij or Eclipse
 
-The example uses a service account for OAuth2 authentication.
-So next, set up to authenticate with the Speech API using your project's
-service account credentials.
+## Running the project
 
-Visit the [Cloud Console](https://console.developers.google.com), and navigate to:
-`API Manager > Credentials > Create credentials >
-Service account key > New service account`.
-Create a new service account, and download the json credentials file.
-
-Then, set
-the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to your
-downloaded service account credentials before running this example:
-
-    export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/credentials-key.json
-
-If you do not do this, you will see an error that looks something like this when
-you run the example scripts:
-`WARNING: RPC failed: Status{code=PERMISSION_DENIED, description=Request had insufficient authentication scopes., cause=null}`.
-See the
-[Cloud Platform Auth Guide](https://cloud.google.com/docs/authentication#developer_workflow)
-for more information.
-
-## Build the application
-
-Then, build the program:
-
-```sh
-$ mvn package
-```
-
-or
-
-```sh
-$ mvn compile
-$ mvn assembly:single
-```
-
-## Run the clients
-
-These programs return the transcription of the audio file you provided.  Please
-note that the audio file must be in RAW format.  You can use `sox`
-(available, e.g. via [http://sox.sourceforge.net/](http://sox.sourceforge.net/)
-or [homebrew](http://brew.sh/)) to convert audio files to raw format.
-
-```
+Set your maven preferences to download and install dependencies automatically. After that, you can run
+the main method in KtaneManager.java at any time to play.
