@@ -161,7 +161,7 @@ public class KtaneGame implements Runnable {
     }
 
     public void postToUser(String toPost) {
-        LOG.debug(toPost);
+        LOG.warn(toPost);
     }
 
     @Override
